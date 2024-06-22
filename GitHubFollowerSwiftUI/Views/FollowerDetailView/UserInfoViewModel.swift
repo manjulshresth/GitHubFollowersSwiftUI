@@ -18,7 +18,8 @@ import SwiftUI
         isLoadingUser = true
         Task{
             do{
-                user = try await NetworkManager.shared.getUserInfo(for: username)
+//              user = try await NetworkManager.shared.getUserInfo(for: username)
+                user = try await NetworkManager.shared.getDataForView(forEndPoint: .userInfo(username: username), responseType: User.self)
                 isLoadingUser = false
             } catch {
                 print("Some error")

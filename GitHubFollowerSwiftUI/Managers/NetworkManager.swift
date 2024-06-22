@@ -19,6 +19,35 @@ class NetworkManager {
         decoder.dateDecodingStrategy = .iso8601
     }
     
+    enum GHEndPoints {
+        case followers(usernme: String, page: Int)
+        case userInfo(username: String)
+        
+        var urlString: String {
+            switch self{
+            case .followers(let username, let page):
+                return NetworkManager.shared.baseUrl + "\(username)/followers?per_page=100&page=\(page)"
+            case .userInfo(let username):
+                return NetworkManager.shared.baseUrl + "\(username)"
+            }
+        }
+    }
+    
+    func getDataForView<T:Decodable>(forEndPoint endPoint : GHEndPoints, responseType : T.Type) async throws -> T{
+        let endPointURL = endPoint.urlString
+        guard let url = URL(string: endPointURL) else { throw AppError.invalidUsername }
+        
+        let (data, response) = try await URLSession.shared.data(from: url)
+        
+        guard let response = response as? HTTPURLResponse, response.statusCode == 200 else { throw AppError.invalidResponse }
+        
+        do {
+            return try decoder.decode(T.self, from: data)
+        } catch {
+            throw AppError.invalidData
+        }
+    }
+    
     func getFollowers(for userName:String, page: Int) async throws -> [Follower] {
         let endPoint = baseUrl + "\(userName)/followers?per_page=100&page=\(page)"
         guard let url = URL(string: endPoint) else { throw AppError.invalidUsername }

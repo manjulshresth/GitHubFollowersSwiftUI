@@ -39,7 +39,8 @@ import SwiftUI
         Task{
             do{
                 print(username)
-                let resultFollowers = try await NetworkManager.shared.getFollowers(for: username, page: page)
+//                let resultFollowers = try await NetworkManager.shared.getFollowers(for: username, page: page)
+                let resultFollowers = try await NetworkManager.shared.getDataForView(forEndPoint: .followers(usernme: username, page: page), responseType: [Follower].self)
                 if (resultFollowers.isEmpty){
                     needLoadMore = false
                     showError = true
